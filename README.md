@@ -25,7 +25,7 @@ $ make
 VisibleSimToGraphAnalyzer works as following:
 
 ```
-Usage: VisibleSimToGraphAnalyzer -i <input xml image> -t <target lattice> [options]
+Usage: VisibleSimToGraphAnalyzer -i <input VisibleSim xml configuration file> -t <target lattice> [options]
 Supported target lattices (<target lattice>): 
   s: Square
   h: Hexagonal

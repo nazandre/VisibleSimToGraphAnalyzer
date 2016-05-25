@@ -80,7 +80,7 @@ Arguments::~Arguments() { }
 
 void Arguments::help() {
   //cerr << "VisibleSim Configuration File To Graph Analyzer File:" << endl;
-  cerr << "Usage: VisibleSimToGraphAnalyzer -i <input xml image> -t <target lattice> [options]"<< endl;
+  cerr << "Usage: VisibleSimToGraphAnalyzer -i <input VisibleSim xml configuration file> -t <target lattice> [options]"<< endl;
   cerr << "Supported target lattices (<target lattice>): " << endl;
   for (int i = 0; i < NUM_LATTICE_TYPES; i++) {
     cerr << "  " << Lattice::typeShortName[i] << ": " << Lattice::typeFullName[i] << endl;
