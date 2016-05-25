@@ -8,6 +8,9 @@ using namespace std;
 #define EVEN(x) (x%2 == 1)
 #define ODD(x) (x%2 == 0)
 
+#define IS_3D (type == SIMPLE_CUBIC_LATTICE || type == FACE_CENTERED_CUBIC_LATTICE)
+#define IS_2D (type == SQUARE_LATTICE || type == HEXAGONAL_LATTICE)
+
 /****** Lattice Class ******/
 
 std::string Lattice::typeShortName[] = {"s","h","sc","fcc"};
@@ -17,14 +20,16 @@ Lattice::Lattice() {
   grid = NULL;
 }
 
-Lattice::Lattice(string vs) {
+Lattice::Lattice(string vs, LatticeType t) {
   visibleSimXML = vs;
   grid = NULL;
+  type = t;
   readXML();
 }
 
 Lattice::Lattice(const Lattice &l) {
   visibleSimXML = l.visibleSimXML;
+  type = l.type;
   grid = NULL;
   readXML();
 }
@@ -37,9 +42,9 @@ Lattice::~Lattice() {
   delete [] grid;
 }
 
-LatticeType Lattice::getType(std::string type) {
+LatticeType Lattice::getType(std::string t) {
   for(int i = 0; i < NUM_LATTICE_TYPES; i++) {
-    if(type == typeShortName[i]) {
+    if(t == typeShortName[i]) {
       return LatticeType(i);
     }
   }
@@ -81,14 +86,24 @@ void Lattice::readXML() {
   if (node) {
     TiXmlElement* worldElement = node->ToElement();
     const char *attr= worldElement->Attribute("gridsize");
-    int lx,ly,lz;
+    if (!attr) {
+      attr= worldElement->Attribute("gridSize");
+    }
+    int lx = 0,ly = 0,lz = 0;
     if (attr) {
       string str=attr;
-      int pos1 = str.find_first_of(',');
-      int pos2 = str.find_last_of(',');
-      lx = atoi(str.substr(0,pos1).c_str());
-      ly = atoi(str.substr(pos1+1,pos2-pos1-1).c_str());
-      lz = atoi(str.substr(pos2+1,str.length()-pos1-1).c_str());
+      if (IS_3D) {
+	int pos1 = str.find_first_of(',');
+	int pos2 = str.find_last_of(',');
+	lx = atoi(str.substr(0,pos1).c_str());
+	ly = atoi(str.substr(pos1+1,pos2-pos1-1).c_str());
+	lz = atoi(str.substr(pos2+1,str.length()-pos1-1).c_str());
+      } else {
+	int pos = str.find_first_of(',');
+	lx = atoi(str.substr(0,pos).c_str());
+	ly = 1;
+	lz = atoi(str.substr(pos+1,str.length()-pos-1).c_str());
+      }
       size = Vector3D(lx,ly,lz);
       cerr << "Grid size: "
 	   << "x=" << size.x << ","
@@ -118,11 +133,25 @@ void Lattice::readXML() {
       const char *attr = element->Attribute("position");
       if (attr) {
 	string str(attr);
-	int pos1 = str.find_first_of(',');
-	int pos2 = str.find_last_of(',');
-	position.x = atoi(str.substr(0,pos1).c_str());
-	position.y = atoi(str.substr(pos1+1,pos2-pos1-1).c_str());
-	position.z = atoi(str.substr(pos2+1,str.length()-pos1-1).c_str());
+	if (IS_3D) {
+	  int pos1 = str.find_first_of(',');
+	  int pos2 = str.find_last_of(',');
+	  position.x = atoi(str.substr(0,pos1).c_str());
+	  position.y = atoi(str.substr(pos1+1,pos2-pos1-1).c_str());
+	  position.z = atoi(str.substr(pos2+1,str.length()-pos1-1).c_str());
+	} else {
+	  if (type == HEXAGONAL_LATTICE) {
+	    int pos = str.find_first_of(',');
+	    position.x = atof(str.substr(0,pos).c_str());
+	    position.y = 0;
+	    position.z = atoi(str.substr(pos+1,str.length()-pos-1).c_str());
+	  } else if (type == SQUARE_LATTICE) {
+	    int pos = str.find_first_of(',');
+	    position.x = atof(str.substr(0,pos).c_str());
+	    position.y = atoi(str.substr(pos+1,str.length()-pos-1).c_str());
+	    position.z = 0;
+	  }
+	}
       } else {
 	// line number ?
 	cerr << "ERROR: No position specified for a module!" << endl;
@@ -205,7 +234,7 @@ list<Node*> Lattice::getNeighbors(Node *n) {
 
 HLattice::HLattice() {}
 
-HLattice::HLattice(std::string vs) : Lattice(vs) {}
+HLattice::HLattice(std::string vs) : Lattice(vs, HEXAGONAL_LATTICE) {}
 
 HLattice::HLattice(const HLattice &l) : Lattice(l) {}
 
@@ -235,7 +264,7 @@ list<Vector3D> HLattice::getRelativeConnectivity(Vector3D &p) {
 
 SCLattice::SCLattice() {}
 
-SCLattice::SCLattice(std::string vs) : Lattice(vs) {
+SCLattice::SCLattice(std::string vs) : Lattice(vs, SIMPLE_CUBIC_LATTICE) {
   nCells.push_back(Vector3D(1,0,0));
   nCells.push_back(Vector3D(-1,0,0));
   nCells.push_back(Vector3D(0,0,1));
@@ -259,7 +288,7 @@ list<Vector3D> SCLattice::getRelativeConnectivity(Vector3D &p) {
 
 FCCLattice::FCCLattice() {}
 
-FCCLattice::FCCLattice(std::string vs) : Lattice(vs) {}
+FCCLattice::FCCLattice(std::string vs) : Lattice(vs, FACE_CENTERED_CUBIC_LATTICE) {}
 
 FCCLattice::FCCLattice(const FCCLattice &l) : Lattice(l) {}
 

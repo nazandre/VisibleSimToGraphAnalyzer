@@ -22,19 +22,22 @@ class Lattice {
 
 public:
   std::string visibleSimXML;
+
+  LatticeType type;
   Vector3D size; // grid size (3D)
   Node ** grid;
   std::vector<Node*> nodes;
+  
 
  
   Lattice();
-  Lattice(std::string vs);
+  Lattice(std::string vs, LatticeType t);
   Lattice(const Lattice &l);
   ~Lattice();
 
   static std::string typeShortName[];
   static std::string typeFullName[];
-  static LatticeType getType(std::string type);
+  static LatticeType getType(std::string t);
 
   bool isIn(Vector3D &p); 
   int getIndex(Vector3D &p);
