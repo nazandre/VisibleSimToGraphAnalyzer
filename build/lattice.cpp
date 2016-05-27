@@ -298,7 +298,7 @@ list<Vector3D> FCCLattice::getRelativeConnectivity(Vector3D &p) {
   list<Vector3D> l;
   list<Vector3D> nCells;
   
-  if (EVEN(p.z)) {
+  if (ODD(p.z)) {
     // z + 1
     nCells.push_back(Vector3D(-1,-1,1));
     nCells.push_back(Vector3D(-1,0,1));
