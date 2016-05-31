@@ -1,6 +1,6 @@
 # VisibleSimToGraphAnalyzer
 
-Convert a VisibleSim configuration file into a file for the GraphAnalyzer tool.
+Convert a [VisibleSim Simulator](http://projects.femto-st.fr/projet-visiblesim/) configuration file into a file for the GraphAnalyzer tool.
 
 ### Dependencies
 
