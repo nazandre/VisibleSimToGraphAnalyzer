@@ -1,5 +1,6 @@
 CC = g++
-CFLAGS = -Wall -std=c++11
+CFLAGS = -Wall -std=c++11 -O3
+
 EXEC_NAME = visibleSimToGraphAnalyzer
 INCLUDES =
 LIBS = -ltinyxml
